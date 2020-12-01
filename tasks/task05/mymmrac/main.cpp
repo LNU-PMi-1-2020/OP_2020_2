@@ -1,5 +1,4 @@
 #include <iostream>
-#include <algorithm>
 
 using namespace std;
 
@@ -9,7 +8,15 @@ void generatePalindromePermutation(const string &text);
 
 bool canMakePalindrome(const string &text, int *letterCounts);
 
+bool nextPermutation(string &s);
+
+int binarySearch(string &s, int l, int r, int key);
+
 string reverse(string text);
+
+void reverseSubstr(string &s, int l, int r);
+
+void swap(char *a, char *b);
 
 int main() {
     string text;
@@ -19,7 +26,6 @@ int main() {
     cout << "All palindromes:" << endl;
     generatePalindromePermutation(text);
 }
-
 
 void generatePalindromePermutation(const string &text) {
     int letterCounts[M];
@@ -46,7 +52,7 @@ void generatePalindromePermutation(const string &text) {
         }
         palindrome += reverse(half);
         cout << palindrome << endl;
-    } while (next_permutation(half.begin(), half.end()));
+    } while (nextPermutation(half));
 }
 
 bool canMakePalindrome(const string &text, int *letterCounts) {
@@ -68,10 +74,53 @@ bool canMakePalindrome(const string &text, int *letterCounts) {
     return oddCount <= 1;
 }
 
-string reverse(string text) {
-    string reversed;
-    for (int i = int(text.length()) - 1; i >= 0; --i) {
-        reversed += text[i];
+bool nextPermutation(string &s) {
+    int len = s.length();
+    int i = len - 2;
+
+    while (i >= 0 && s[i] >= s[i + 1]) {
+        --i;
     }
-    return reversed;
+
+    if (i < 0) {
+        return false;
+    } else {
+        int index = binarySearch(s, i + 1, len - 1, s[i]);
+        swap(&s[i], &s[index]);
+        reverseSubstr(s, i + 1, len - 1);
+        return true;
+    }
+}
+
+int binarySearch(string &s, int l, int r, int key) {
+    int index = -1;
+    while (l <= r) {
+        int mid = l + (r - l) / 2;
+        if (s[mid] <= key) {
+            r = mid - 1;
+        } else {
+            l = mid + 1;
+            if (index == -1 || s[index] >= s[mid]) {
+                index = mid;
+            }
+        }
+    }
+    return index;
+}
+
+string reverse(string text) {
+    reverseSubstr(text, 0, int(text.length()) - 1);
+    return text;
+}
+
+void reverseSubstr(string &s, int l, int r) {
+    while (l < r) {
+        swap(&s[l++], &s[r--]);
+    }
+}
+
+void swap(char *a, char *b) {
+    char tmp = *a;
+    *a = *b;
+    *b = tmp;
 }

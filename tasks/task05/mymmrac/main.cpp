@@ -1,62 +1,77 @@
-#include <bits/stdc++.h>
+#include <iostream>
+#include <algorithm>
 
 using namespace std;
+
 #define M 26
 
-bool isPalindrome(const string &str, int *freq) {
-    memset(freq, 0, M * sizeof(int));
-    for (char i : str) {
-        freq[i - 'a']++;
-    }
+void generatePalindromePermutation(const string &text);
 
-    int odd = 0;
-    for (int i = 0; i < M; i++) {
-        if (freq[i] % 2 == 1) {
-            odd++;
-        }
-    }
+bool canMakePalindrome(const string &text, int *letterCounts);
 
-    return odd <= 1;
+string reverse(string text);
+
+int main() {
+    string text;
+    cout << "Enter text:" << endl;
+    cin >> text;
+
+    cout << "All palindromes:" << endl;
+    generatePalindromePermutation(text);
 }
 
-string reverse(string str) {
-    string rev = std::move(str);
-    reverse(rev.begin(), rev.end());
-    return rev;
-}
 
-void generatePalindromePermutation(const string &str) {
-    int freq[M];
-    if (!isPalindrome(str, freq)) {
+void generatePalindromePermutation(const string &text) {
+    int letterCounts[M];
+    if (!canMakePalindrome(text, letterCounts)) {
+        cout << "Can't make palindrome" << endl;
         return;
     }
 
-    int l = str.length();
     string half;
-    char oddC;
+    char oddChar;
     for (int i = 0; i < M; i++) {
-        if (freq[i] % 2 == 1) {
-            oddC = char(i + int('a'));
+        if (letterCounts[i] % 2 == 1) {
+            oddChar = char(i + int('a'));
         }
-        half += string(freq[i] / 2, i + 'a');
+        half += string(letterCounts[i] / 2, i + 'a');
     }
 
     string palindrome;
+    int l = text.length();
     do {
         palindrome = half;
         if (l % 2 == 1) {
-            palindrome += oddC;
+            palindrome += oddChar;
         }
         palindrome += reverse(half);
         cout << palindrome << endl;
     } while (next_permutation(half.begin(), half.end()));
 }
 
-int main() {
-    string str;
-    cout << "Enter text" << endl;
-    cin >> str;
+bool canMakePalindrome(const string &text, int *letterCounts) {
+    for (int i = 0; i < M; ++i) {
+        letterCounts[i] = 0;
+    }
 
-    cout << "All palindrome permutations of " << str << " are:\n";
-    generatePalindromePermutation(str);
+    for (char i : text) {
+        letterCounts[i - 'a']++;
+    }
+
+    int oddCount = 0;
+    for (int i = 0; i < M; i++) {
+        if (letterCounts[i] % 2 == 1) {
+            oddCount++;
+        }
+    }
+
+    return oddCount <= 1;
+}
+
+string reverse(string text) {
+    string reversed;
+    for (int i = int(text.length()) - 1; i >= 0; --i) {
+        reversed += text[i];
+    }
+    return reversed;
 }
